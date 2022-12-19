@@ -10,7 +10,6 @@ database_path = "postgresql://{}:{}{}/{}".format(
     "@localhost:5432",
     database_name,
 )
-print(database_path)
 
 db = SQLAlchemy()
 
