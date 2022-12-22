@@ -147,6 +147,34 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue("success" in res.json and "error" in res.json)
         self.assertFalse(res.json["success"])
 
+    def test_search_question_should_return_results(self):
+        """Searching a question should return results (assuming at least one match)"""
+        res = self.client().post("/questions", json={"search": "title"})
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(
+            "success" in res.json
+            and "questions" in res.json
+            and "total_questions" in res.json
+        )
+        self.assertTrue(res.json["success"])
+        self.assertTrue(res.json["questions"])
+        self.assertTrue(res.json["total_questions"])
+
+    def test_search_question_no_match_should_return_empty_list(self):
+        """Empty list should be returned assuming search term with zero matches."""
+        res = self.client().post("/questions", json={"search": "qqqas"})
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(
+            "success" in res.json
+            and "questions" in res.json
+            and "total_questions" in res.json
+        )
+        self.assertTrue(res.json["success"])
+        self.assertFalse(res.json["questions"])
+        self.assertEqual(0, len(res.json["total_questions"]))
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
