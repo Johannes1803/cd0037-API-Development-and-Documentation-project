@@ -37,7 +37,7 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
-    def test_get_categories_should_return_json(self):
+    def test_get_categories_should_return_results(self):
         res = self.client().get("/categories")
 
         self.assertEqual(200, res.status_code)
@@ -57,7 +57,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(404, res.status_code)
         self.assertTrue("success" in res.json and "error" in res.json)
 
-    def test_get_questions_should_return_json(self):
+    def test_get_questions_should_return_results(self):
         """Test get request to '/questions' route returns results in expected format"""
         res = self.client().get("/questions?page=3")
 
@@ -111,7 +111,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue("success" in res.json and "error" in res.json)
         self.assertFalse(res.json["success"])
 
-    def test_post_new_question_should_return_json(self):
+    def test_post_new_question_should_return_id_of_created_item(self):
         """Posting a new question should return success response."""
         # make POST request
         res = self.client().post(
