@@ -111,6 +111,42 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue("success" in res.json and "error" in res.json)
         self.assertFalse(res.json["success"])
 
+    def test_post_new_question_should_return_json(self):
+        """Posting a new question should return success response."""
+        # make POST request
+        res = self.client().post(
+            "/questions",
+            json={
+                "question": "Who was the second James Bond Actor?",
+                "answer": "Roger Moore",
+                "category": "movies",
+                "difficulty": 3,
+            },
+        )
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(
+            "success" in res.json
+            and "created" in res.json
+            and "total_questions" in res.json
+        )
+
+    def test_post_new_question_missing_arg_should_return_422(self):
+        """Forgetting a required arg to init a new question should raise a 422 error."""
+        # make POST request
+        res = self.client().post(
+            "/questions",
+            json={
+                "answer": "Roger Moore",
+                "category": "movies",
+                "difficulty": 3,
+            },
+        )
+
+        self.assertEqual(422, res.status_code)
+        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertFalse(res.json["success"])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
