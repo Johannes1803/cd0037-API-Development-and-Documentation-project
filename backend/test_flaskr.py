@@ -55,9 +55,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get("/categories?page=1000")
 
         self.assertEqual(404, res.status_code)
-        self.assertTrue(
-            "success" in res.json and "error" in res.json and "message" in res.json
-        )
+        self.assertTrue("success" in res.json and "error" in res.json)
 
     def test_get_questions_should_return_json(self):
         """Test get request to '/questions' route returns results in expected format"""
@@ -73,14 +71,45 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(res.json["questions"])
         self.assertTrue(res.json["total_questions"])
 
-    def test_get_categories_should_raise_404(self):
+    def test_get_questions_should_raise_404(self):
         """If pagination exceeds number of available pages, return 404."""
         res = self.client().get("/pages?page=1000")
 
         self.assertEqual(404, res.status_code)
-        self.assertTrue(
-            "success" in res.json and "error" in res.json and "message" in res.json
-        )
+        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertFalse(res.json["success"])
+
+    def test_delete_question_should_remove_db_entry(self):
+        """Making a delete request should remove question from db"""
+        # check question is in db before request
+        with self.app.app_context():
+            question = Question.query.get(1)
+            self.assertTrue(question)
+
+        # make DELETE request
+        res = self.client().delete("/questions/1")
+
+        # check response
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res["success"], True)
+        self.assertEqual(res["deleted"], 2)
+        self.assertTrue(res["total_questions"])
+        self.assertTrue(len(res["questions"]))
+
+        # check entry is removed from db
+        with self.app.app_context():
+            question = Question.query.get(1)
+            self.assertIsNone(question)
+
+    def test_delete_question_should_raise_404(self):
+        """Trying to delete a question that does not exist should raise a 404 error."""
+        # make DELETE request
+        res = self.client().delete("/questions/100000")
+
+        # check response
+        self.assertEqual(404, res.status_code)
+        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertFalse(res.json["success"])
 
 
 # Make the tests conveniently executable
