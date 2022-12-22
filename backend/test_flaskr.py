@@ -55,7 +55,32 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get("/categories?page=1000")
 
         self.assertEqual(404, res.status_code)
-        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertTrue(
+            "success" in res.json and "error" in res.json and "message" in res.json
+        )
+
+    def test_get_questions_should_return_json(self):
+        """Test get request to '/questions' route returns results in expected format"""
+        res = self.client().get("/questions?page=3")
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(
+            "success" in res.json
+            and "questions" in res.json
+            and "total_questions" in res.json
+        )
+        self.assertTrue(res.json["success"])
+        self.assertTrue(res.json["questions"])
+        self.assertTrue(res.json["total_questions"])
+
+    def test_get_categories_should_raise_404(self):
+        """If pagination exceeds number of available pages, return 404."""
+        res = self.client().get("/pages?page=1000")
+
+        self.assertEqual(404, res.status_code)
+        self.assertTrue(
+            "success" in res.json and "error" in res.json and "message" in res.json
+        )
 
 
 # Make the tests conveniently executable
