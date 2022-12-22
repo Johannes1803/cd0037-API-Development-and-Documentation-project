@@ -15,7 +15,7 @@ class TriviaTestCase(unittest.TestCase):
         test_config = {
             "SQLALCHEMY_DATABASE_URI": "postgresql://student:student@localhost:5432/trivia_test",
             "SQLALCHEMY_TRACK_MODIFICATIONS": False,
-            "TESTING": True
+            "TESTING": True,
         }
         self.app = create_app(test_config)
         setup_db(self.app)
@@ -37,7 +37,7 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
-    def test_get_categories(self):
+    def test_get_categories_should_return_json(self):
         res = self.client().get("/categories")
 
         self.assertEqual(200, res.status_code)
@@ -49,6 +49,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["categories"])
         self.assertTrue(res.json["total_categories"])
+
+    def test_get_categories_should_raise_404(self):
+        """If pagination exceeds number of available pages, return 404."""
+        res = self.client().get("/categories?page=1000")
+
+        self.assertEqual(404, res.status_code)
+        self.assertTrue("success" in res.json and "error" in res.json)
 
 
 # Make the tests conveniently executable
