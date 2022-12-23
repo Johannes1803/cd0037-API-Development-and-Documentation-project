@@ -155,11 +155,11 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(
             "success" in res.json
             and "questions" in res.json
-            and "total_questions" in res.json
+            and "total_matches" in res.json
         )
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["questions"])
-        self.assertTrue(res.json["total_questions"])
+        self.assertTrue(res.json["total_matches"])
 
     def test_search_question_no_match_should_return_empty_list(self):
         """Empty list should be returned assuming search term with zero matches."""
@@ -169,11 +169,57 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(
             "success" in res.json
             and "questions" in res.json
-            and "total_questions" in res.json
+            and "total_matches" in res.json
         )
         self.assertTrue(res.json["success"])
         self.assertFalse(res.json["questions"])
-        self.assertEqual(0, len(res.json["total_questions"]))
+        self.assertEqual(0, len(res.json["total_matches"]))
+
+    def test_get_questions_of_category_should_return_results(self):
+        """Sending GET request to '/categories/<id>/questions' should return results."""
+        res = self.client().get("/categories/1/questions")
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(
+            "success" in res.json
+            and "questions" in res.json
+            and "total_questions_in_category" in res.json
+        )
+        self.assertTrue(res.json["success"])
+        self.assertTrue(res.json["questions"])
+        self.assertTrue(res.json["total_questions_in_category"])
+
+    def test_get_questions_of_category_should_return_404(self):
+        """Sending GET request to '/categories/<id>/questions' should return 404 if category does not exist."""
+        res = self.client().get("/categories/10000/questions")
+
+        # check response
+        self.assertEqual(404, res.status_code)
+        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertFalse(res.json["success"])
+
+    def test_post_quizzes_should_return_random_unseen_question(self):
+        """Sending POST request to '/quizzes' should return a new, unseen question."""
+        res = self.client().post(
+            "/quizzes", json={"previous_questions": [1, 3, 7, 20, 40], "category": 1}
+        )
+
+        # check responses
+        self.assertEqual(200, res.status_code)
+        self.assertTrue("success" in res.json and "question" in res.json)
+        self.assertTrue(res.json["success"])
+        self.assertTrue(res.json["question"])
+
+    def test_post_quizzes_should_return_422_missing_keys_in_body(self):
+        """Sending POST request to '/quizzes' should return a 422 error if required key in body is missing."""
+        res = self.client().post(
+            "/quizzes", json={"previous_questions": [1, 3, 7, 20, 40]}
+        )
+
+        # check responses
+        self.assertEqual(422, res.status_code)
+        self.assertTrue("success" in res.json and "error" in res.json)
+        self.assertFalse(res.json["success"])
 
 
 # Make the tests conveniently executable
