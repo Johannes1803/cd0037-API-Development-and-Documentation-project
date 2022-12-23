@@ -50,16 +50,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(res.json["categories"])
         self.assertTrue(res.json["total_categories"])
 
-    def test_get_categories_should_raise_404(self):
-        """If pagination exceeds number of available pages, return 404."""
-        res = self.client().get("/categories?page=1000")
-
-        self.assertEqual(404, res.status_code)
-        self.assertTrue("success" in res.json and "error" in res.json)
-
     def test_get_questions_should_return_results(self):
         """Test get request to '/questions' route returns results in expected format"""
-        res = self.client().get("/questions?page=3")
+        res = self.client().get("/questions?page=2")
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(
@@ -82,23 +75,24 @@ class TriviaTestCase(unittest.TestCase):
     def test_delete_question_should_remove_db_entry(self):
         """Making a delete request should remove question from db"""
         # check question is in db before request
+        question_id = 9
         with self.app.app_context():
-            question = Question.query.get(1)
+            question = Question.query.get(question_id)
             self.assertTrue(question)
 
         # make DELETE request
-        res = self.client().delete("/questions/1")
+        res = self.client().delete("/questions/9")
 
         # check response
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res["success"], True)
-        self.assertEqual(res["deleted"], 2)
+        self.assertEqual(res["deleted"], question_id)
         self.assertTrue(res["total_questions"])
         self.assertTrue(len(res["questions"]))
 
         # check entry is removed from db
         with self.app.app_context():
-            question = Question.query.get(1)
+            question = Question.query.get(question_id)
             self.assertIsNone(question)
 
     def test_delete_question_should_raise_404(self):
