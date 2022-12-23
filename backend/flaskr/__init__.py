@@ -1,12 +1,19 @@
 import os
-from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 import random
+import logging
 
-from models import setup_db, Question, Category
+from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from models import Category, Question, setup_db
 
 QUESTIONS_PER_PAGE = 10
+
+
+def paginate(collection_, elements_per_page, page):
+    start_index = elements_per_page * (page - 1)
+    end_index = start_index + elements_per_page
+    return collection_[start_index:end_index]
 
 
 def create_app(test_config=None):
@@ -14,14 +21,13 @@ def create_app(test_config=None):
     app = Flask(__name__)
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        app.config.from_pyfile("config.py", silent=True)
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
     setup_db(app)
     CORS(app)
-
 
     # CORS Headers
     @app.after_request
@@ -33,32 +39,73 @@ def create_app(test_config=None):
             "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
         )
         return response
-    """
-    @TODO:
-    Create an endpoint to handle GET requests
-    for all available categories.
-    """
 
-    """
-    @TODO:
-    Create an endpoint to handle GET requests for questions,
-    including pagination (every 10 questions).
-    This endpoint should return a list of questions,
-    number of total questions, current category, categories.
+    @app.route("/categories")
+    def get_categories():
+        categories = Category.query.all()
+        formatted_categories = {category.id: category.type for category in categories}
+        return jsonify(
+            {
+                "success": True,
+                "categories": formatted_categories,
+                "total_categories": len(formatted_categories),
+            }
+        )
 
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions.
-    """
+    @app.route("/questions")
+    def get_questions():
+        page = request.args.get("page", 1, type=int)
 
-    """
-    @TODO:
-    Create an endpoint to DELETE question using a question ID.
+        categories = Category.query.all()
+        formatted_categories = {category.id: category.type for category in categories}
 
-    TEST: When you click the trash icon next to a question, the question will be removed.
-    This removal will persist in the database and when you refresh the page.
-    """
+        questions = Question.query.all()
+        selected_questions = paginate(
+            questions, elements_per_page=QUESTIONS_PER_PAGE, page=page
+        )
+        if not selected_questions:
+            abort(404)
+        formatted_questions = [question.format() for question in selected_questions]
+
+        return jsonify(
+            {
+                "success": True,
+                "questions": formatted_questions,
+                "total_questions": len(questions),
+                "categories": formatted_categories,
+                "current_category": None,
+            }
+        )
+
+    @app.route("/questions/<int:question_id>", methods=["DELETE"])
+    def delete_question(question_id):
+        page = request.args.get("page", 1, type=int)
+        with app.app_context():
+            question = Question.query.get(question_id)
+            if not question:
+                abort(404)
+            else:
+                try:
+                    question.delete()
+                    all_questions = question.query.all()
+                    selected_questions = paginate(
+                        all_questions, page=page, elements_per_page=QUESTIONS_PER_PAGE
+                    )
+                    formatted_questions = [
+                        question.format() for question in selected_questions
+                    ]
+                except Exception as e:
+                    app.logger.warning(e)
+                    abort(500)
+                else:
+                    return jsonify(
+                        {
+                            "success": True,
+                            "deleted": question_id,
+                            "total_questions": len(all_questions),
+                            "questions": formatted_questions,
+                        }
+                    )
 
     """
     @TODO:
@@ -108,5 +155,12 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return (
+            jsonify({"success": False, "error": 404, "message": "resource not found"}),
+            404,
+        )
 
     return app
