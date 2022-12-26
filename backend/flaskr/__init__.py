@@ -107,61 +107,66 @@ def create_app(test_config=None):
                         }
                     )
 
-    """
-    @TODO:
-    Create an endpoint to POST a new question,
-    which will require the question and answer text,
-    category, and difficulty score.
-
-    TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.
-    """
-
     @app.route("/questions", methods=["POST"])
     def post_new_question():
         """Post a new question."""
-        with app.app_context():
-            try:
-                question = Question(
-                    question=request.json["question"],
-                    answer=request.json["answer"],
-                    category=request.json["category"],
-                    difficulty=request.json["difficulty"],
+        if request.json.get("searchTerm"):
+            with app.app_context():
+                search_term = request.json["searchTerm"].lower()
+                all_matching_questions = Question.query.filter(
+                    Question.question.ilike("%{}%".format(search_term))
+                ).all()
+                current_matching_questions = paginate(
+                    all_matching_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1
                 )
-            except KeyError as e:
-                app.logger.warning(e)
-                abort(422)
+                current_matching_questions = [
+                    question.format() for question in current_matching_questions
+                ]
 
-            else:
-                try:
-                    question.insert()
-
-                    all_questions = Question.query.all()
-                    current_questions = paginate(all_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1)
-                    current_questions = [question.format() for question in current_questions]
-                except Exception as e:
-                    app.logger.debug(e)
-                    abort(500)
-                else:
-                    return jsonify({
+                return jsonify(
+                    {
                         "success": True,
-                        "questions": current_questions,
-                        "total_questions": len(all_questions),
-                        "created": question.id
+                        "questions": current_matching_questions,
+                        "total_questions": len(all_matching_questions),
+                    }
+                )
 
-                    })
+        else:
+            with app.app_context():
+                try:
+                    question = Question(
+                        question=request.json["question"],
+                        answer=request.json["answer"],
+                        category=request.json["category"],
+                        difficulty=request.json["difficulty"],
+                    )
+                except KeyError as e:
+                    app.logger.warning(e)
+                    abort(422)
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions based on a search term.
-    It should return any questions for whom the search term
-    is a substring of the question.
+                else:
+                    try:
+                        question.insert()
 
-    TEST: Search by any phrase. The questions list will update to include
-    only question that include that string within their question.
-    Try using the word "title" to start.
-    """
+                        all_questions = Question.query.all()
+                        current_questions = paginate(
+                            all_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1
+                        )
+                        current_questions = [
+                            question.format() for question in current_questions
+                        ]
+                    except Exception as e:
+                        app.logger.debug(e)
+                        abort(500)
+                    else:
+                        return jsonify(
+                            {
+                                "success": True,
+                                "questions": current_questions,
+                                "total_questions": len(all_questions),
+                                "created": question.id,
+                            }
+                        )
 
     """
     @TODO:
@@ -200,9 +205,10 @@ def create_app(test_config=None):
     @app.errorhandler(422)
     def not_found(error):
         return (
-            jsonify({"success": False, "error": 422, "message": "Unprocessable Entity"}),
+            jsonify(
+                {"success": False, "error": 422, "message": "Unprocessable Entity"}
+            ),
             422,
         )
 
     return app
-
