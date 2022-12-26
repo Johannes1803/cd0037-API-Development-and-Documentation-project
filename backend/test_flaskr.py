@@ -194,8 +194,9 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_post_quizzes_should_return_random_unseen_question(self):
         """Sending POST request to '/quizzes' should return a new, unseen question."""
+        previous_questions = [1, 3, 7, 20, 40]
         res = self.client().post(
-            "/quizzes", json={"previous_questions": [1, 3, 7, 20, 40], "category": 1}
+            "/quizzes", json={"previous_questions": previous_questions, "category": 1}
         )
 
         # check responses
@@ -203,6 +204,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue("success" in res.json and "question" in res.json)
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["question"])
+        self.assertFalse(res.json["question"].id in previous_questions)
 
     def test_post_quizzes_should_return_422_missing_keys_in_body(self):
         """Sending POST request to '/quizzes' should return a 422 error if required key in body is missing."""
