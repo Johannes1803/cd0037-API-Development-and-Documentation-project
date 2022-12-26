@@ -177,6 +177,29 @@ def create_app(test_config=None):
     category to be shown.
     """
 
+    @app.route("/categories/<int:category_id>/questions")
+    def get_category(category_id):
+        category = Category.query.get(category_id)
+        if not category:
+            abort(404)
+        else:
+            questions_of_category = Question.query.filter(
+                Question.category == category.id
+            ).all()
+            current_questions_of_category = paginate(
+                questions_of_category, elements_per_page=QUESTIONS_PER_PAGE, page=1
+            )
+            current_questions_of_category = [
+                question.format() for question in current_questions_of_category
+            ]
+            return jsonify(
+                {
+                    "success": True,
+                    "questions": current_questions_of_category,
+                    "total_questions": len(questions_of_category),
+                }
+            )
+
     """
     @TODO:
     Create a POST endpoint to get questions to play the quiz.
@@ -203,7 +226,7 @@ def create_app(test_config=None):
         )
 
     @app.errorhandler(422)
-    def not_found(error):
+    def unprocessable_entity(error):
         return (
             jsonify(
                 {"success": False, "error": 422, "message": "Unprocessable Entity"}
