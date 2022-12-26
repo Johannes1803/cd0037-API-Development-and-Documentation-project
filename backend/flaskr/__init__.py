@@ -118,6 +118,40 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.
     """
 
+    @app.route("/questions", methods=["POST"])
+    def post_new_question():
+        """Post a new question."""
+        with app.app_context():
+            try:
+                question = Question(
+                    question=request.json["question"],
+                    answer=request.json["answer"],
+                    category=request.json["category"],
+                    difficulty=request.json["difficulty"],
+                )
+            except KeyError as e:
+                app.logger.warning(e)
+                abort(422)
+
+            else:
+                try:
+                    question.insert()
+
+                    all_questions = Question.query.all()
+                    current_questions = paginate(all_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1)
+                    current_questions = [question.format() for question in current_questions]
+                except Exception as e:
+                    app.logger.debug(e)
+                    abort(500)
+                else:
+                    return jsonify({
+                        "success": True,
+                        "questions": current_questions,
+                        "total_questions": len(all_questions),
+                        "created": question.id
+
+                    })
+
     """
     @TODO:
     Create a POST endpoint to get questions based on a search term.
@@ -163,4 +197,12 @@ def create_app(test_config=None):
             404,
         )
 
+    @app.errorhandler(422)
+    def not_found(error):
+        return (
+            jsonify({"success": False, "error": 422, "message": "Unprocessable Entity"}),
+            422,
+        )
+
     return app
+
