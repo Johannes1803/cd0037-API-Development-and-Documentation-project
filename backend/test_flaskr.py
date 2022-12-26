@@ -113,7 +113,7 @@ class TriviaTestCase(unittest.TestCase):
             json={
                 "question": "Who was the second James Bond Actor?",
                 "answer": "Roger Moore",
-                "category": "movies",
+                "category": 3,
                 "difficulty": 3,
             },
         )
@@ -132,7 +132,7 @@ class TriviaTestCase(unittest.TestCase):
             "/questions",
             json={
                 "answer": "Roger Moore",
-                "category": "movies",
+                "category": 3,
                 "difficulty": 3,
             },
         )
