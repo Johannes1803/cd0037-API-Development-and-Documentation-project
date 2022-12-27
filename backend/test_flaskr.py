@@ -197,7 +197,7 @@ class TriviaTestCase(unittest.TestCase):
         previous_questions = [1, 3, 7, 20, 40]
         res = self.client().post(
             "/quizzes",
-            json={"previous_questions": previous_questions, "quiz_category": 1},
+            json={"previous_questions": previous_questions, "quiz_category": {"id": 1, "type": "Science"}},
         )
 
         # check responses

@@ -208,14 +208,14 @@ def create_app(test_config=None):
         try:
             app.logger.debug(request.json)
             previous_questions = request.json["previous_questions"]
-            quiz_category = request.json["quiz_category"]
+            quiz_category_id = request.json["quiz_category"]["id"]
         except KeyError as e:
             app.logger.warning(e)
             abort(422)
         else:
             try:
                 questions = Question.query.filter(
-                    Question.category == quiz_category,
+                    Question.category == quiz_category_id,
                     ~Question.id.in_(previous_questions),
                 ).all()
             except Exception as e:
