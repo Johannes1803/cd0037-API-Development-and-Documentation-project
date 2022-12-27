@@ -168,15 +168,6 @@ def create_app(test_config=None):
                             }
                         )
 
-    """
-    @TODO:
-    Create a GET endpoint to get questions based on category.
-
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
-
     @app.route("/categories/<int:category_id>/questions")
     def get_category(category_id):
         category = Category.query.get(category_id)
@@ -212,6 +203,36 @@ def create_app(test_config=None):
     and shown whether they were correct or not.
     """
 
+    @app.route("/quizzes", methods=["POST"])
+    def get_quiz_question():
+        try:
+            app.logger.debug(request.json)
+            previous_questions = request.json["previous_questions"]
+            quiz_category = request.json["quiz_category"]
+        except KeyError as e:
+            app.logger.warning(e)
+            abort(422)
+        else:
+            try:
+                questions = Question.query.filter(
+                    Question.category == quiz_category,
+                    ~Question.id.in_(previous_questions),
+                ).all()
+            except Exception as e:
+                app.logger.warning(e)
+                abort(500)
+            else:
+                if not questions:
+                    abort(404)
+                else:
+                    question = random.choice(questions)
+                    return jsonify(
+                        {
+                            "success": True,
+                            "question": question.format(),
+                        }
+                    )
+
     """
     @TODO:
     Create error handlers for all expected errors
@@ -232,6 +253,15 @@ def create_app(test_config=None):
                 {"success": False, "error": 422, "message": "Unprocessable Entity"}
             ),
             422,
+        )
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return (
+            jsonify(
+                {"success": False, "error": 500, "message": "Internal Server Error"}
+            ),
+            500,
         )
 
     return app

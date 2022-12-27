@@ -18,3 +18,5 @@ frontend/node_modules/
 .flaskenv
 
 .idea
+.trunk
+node_modules
