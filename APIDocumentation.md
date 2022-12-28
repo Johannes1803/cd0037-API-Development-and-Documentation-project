@@ -1,10 +1,58 @@
-# API Documentation
+# Trivia API Documentation
+## Welcome
+
+To the udacity trivia api, which provides a curated collection of quiz questions powering fun quiz games.
+You can view available questions, search, add new questions, delete existing questions and much more.
+Refer to [Endpoints](#Endpoints) for a complete list.
+
+## API Overview
+General remarks, which are valid for all endpoints.
+### Base URL
+This api is not currently hosted. Follow the setup instructions under README.md.
+The base url is then defined by scheme, host, port and base route. This will be referred to as
+{{base_url}} from here on. 
+
+Examples
+
+- localhost:5000
+- https://my-website.com:5000
+- https://my-website.com:5000/api/v2
+
+
+
+### Format
+The api expects response bodies to be in json format and returns json objects in its responses. 
+
+Each response contains a 'success' key with a boolean value.
+```json
+{
+    "success": true,
+    ...
+}
+```
+### Error Codes
+
+If 'success' is false, the response further always contains an 'error' code and a 'message'.
+
+Example:
+```json
+{
+    "error": 422,
+    "message": "Unprocessable Entity",
+    "success": false
+}
+```
+
+The api returns the following error codes:
+- 404: The requested resource could not be found.
+- 422: The request was syntactically well formatted, but expected values were missing, of wrong type or not in the expected range.
+- 500: An unpredicted internal server error occurred.
 
 ## Endpoints
 
 ### Get categories
 
-`GET '/api/v1.0/categories'`
+`GET '{{base_url}}/categories'`
 
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
@@ -24,7 +72,7 @@ Example response:
 
 ### Get questions
 
-`GET /api/v1.0/questions'`
+`GET {{base_url}}/questions'`
 
 - Get the questions of the trivia api. Results are paginated.
 - Request Arguments:
@@ -72,7 +120,7 @@ Example response:
 
 ### Delete a particular question
 
-`DELETE '/api/v1.0/questions/<int:question_id>'`
+`DELETE '{{base_url}}/questions/<int:question_id>'`
 
 - Delete the question specified by question_id in the route.
 - Request Arguments:
@@ -88,7 +136,7 @@ Example response:
 
 ### Post a new question
 
-`POST '/api/v1.0/questions/'`
+`POST '{{base_url}}/questions/'`
  
  - Post a new question.
  - Request Arguments: None
@@ -138,7 +186,7 @@ Example Response:
 
 ### Search a question
 
-`POST '/api/v1.0/questions/'`
+`POST '{{base_url}}/questions/'`
 
 - Search a question by search_term. Results are paginated.
 - Request Arguments:
@@ -152,7 +200,7 @@ Example Response:
 
 ### Get questions of one category
 
-`GET '/api/v1.0/categories/<int:category_id>/questions'`
+`GET '{{base_url}}/categories/<int:category_id>/questions'`
 
 - Get questions of one category. Results are paginated.
 - Request Arguments:
@@ -165,7 +213,7 @@ Example Response:
 
 ### Get next question in quiz mode
 
-`POST '/api/v1.0/quizzes'`
+`POST '{{base_url}}/quizzes'`
 
 - Get an unasked question from a specific category.
 - Request Arguments: None
