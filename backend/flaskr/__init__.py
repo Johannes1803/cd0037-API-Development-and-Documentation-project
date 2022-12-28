@@ -120,7 +120,9 @@ def create_app(test_config=None):
         if request.json.get("searchTerm"):
             with app.app_context():
                 categories = Category.query.all()
-                formatted_categories = {category.id: category.type for category in categories}
+                formatted_categories = {
+                    category.id: category.type for category in categories
+                }
 
                 search_term = request.json["searchTerm"].lower()
                 all_matching_questions = Question.query.filter(
@@ -145,7 +147,7 @@ def create_app(test_config=None):
                         "success": True,
                         "questions": current_matching_questions,
                         "total_questions": len(all_matching_questions),
-                        "current_category": cat_name
+                        "current_category": cat_name,
                     }
                 )
 
@@ -210,7 +212,7 @@ def create_app(test_config=None):
                     "success": True,
                     "questions": current_questions_of_category,
                     "total_questions": len(questions_of_category),
-                    "current_category": category.type
+                    "current_category": category.type,
                 }
             )
 
@@ -233,16 +235,13 @@ def create_app(test_config=None):
                 app.logger.warning(e)
                 abort(500)
             else:
-                if not questions:
-                    abort(404)
-                else:
-                    question = random.choice(questions)
-                    return jsonify(
-                        {
-                            "success": True,
-                            "question": question.format(),
-                        }
-                    )
+                resp_dict = {
+                    "success": True,
+                }
+                question = random.choice(questions).format() if questions else None
+                if question:
+                    resp_dict["question"] = question
+                return jsonify(resp_dict)
 
     @app.errorhandler(404)
     def not_found(error):

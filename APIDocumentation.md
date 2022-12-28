@@ -224,7 +224,7 @@ Example Response:
 - Returns:
     a json object with the following keys:
     - success: boolean status 
-    - question:  object with question, answer, category and difficulty key.
+    - optional[question]:  object with question, answer, category and difficulty key. Missing, if all questions in quiz were played.
 
 Example request body:
 ```json
