@@ -210,6 +210,7 @@ Example Response:
     - success: boolean status 
     - questions: list of questions, where each question is an object with question, answer, category and difficulty key. All questions share the same category as defined in the route.
     - total_questions: number of total_questions within the category.
+    - current_category: category of current question
 
 ### Get next question in quiz mode
 
