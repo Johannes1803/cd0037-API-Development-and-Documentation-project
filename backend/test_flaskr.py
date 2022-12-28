@@ -178,10 +178,12 @@ class TriviaTestCase(unittest.TestCase):
             "success" in res.json
             and "questions" in res.json
             and "total_questions" in res.json
+            and "current_category" in res.json
         )
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["questions"])
         self.assertTrue(res.json["total_questions"])
+        self.assertTrue(res.json["current_category"])
 
     def test_get_questions_of_category_should_return_404(self):
         """Sending GET request to '/categories/<id>/questions' should return 404 if category does not exist."""

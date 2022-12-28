@@ -201,6 +201,7 @@ def create_app(test_config=None):
                     "success": True,
                     "questions": current_questions_of_category,
                     "total_questions": len(questions_of_category),
+                    "current_category": category.type
                 }
             )
 
