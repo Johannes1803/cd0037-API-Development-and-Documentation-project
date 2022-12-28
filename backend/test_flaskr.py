@@ -1,10 +1,8 @@
-import os
 import unittest
-import json
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
-from models import setup_db, Question, Category
+from models import setup_db, Question
 
 
 class TriviaTestCase(unittest.TestCase):
@@ -197,7 +195,10 @@ class TriviaTestCase(unittest.TestCase):
         previous_questions = [1, 3, 7, 20, 40]
         res = self.client().post(
             "/quizzes",
-            json={"previous_questions": previous_questions, "quiz_category": {"id": 1, "type": "Science"}},
+            json={
+                "previous_questions": previous_questions,
+                "quiz_category": {"id": 1, "type": "Science"},
+            },
         )
 
         # check responses
@@ -205,7 +206,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue("success" in res.json and "question" in res.json)
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["question"])
-        print(res.json["question"]["id"])
         self.assertFalse(res.json["question"]["id"] in previous_questions)
 
     def test_post_quizzes_should_return_422_missing_keys_in_body(self):
