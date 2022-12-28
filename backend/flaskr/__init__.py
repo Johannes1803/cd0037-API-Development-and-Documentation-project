@@ -110,6 +110,8 @@ def create_app(test_config=None):
     @app.route("/questions", methods=["POST"])
     def post_new_question():
         """Post a new question."""
+        page = request.args.get("page", 1, type=int)
+
         if request.json.get("searchTerm"):
             with app.app_context():
                 search_term = request.json["searchTerm"].lower()
@@ -117,7 +119,9 @@ def create_app(test_config=None):
                     Question.question.ilike("%{}%".format(search_term))
                 ).all()
                 current_matching_questions = paginate(
-                    all_matching_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1
+                    all_matching_questions,
+                    elements_per_page=QUESTIONS_PER_PAGE,
+                    page=page,
                 )
                 current_matching_questions = [
                     question.format() for question in current_matching_questions
@@ -150,7 +154,9 @@ def create_app(test_config=None):
 
                         all_questions = Question.query.all()
                         current_questions = paginate(
-                            all_questions, elements_per_page=QUESTIONS_PER_PAGE, page=1
+                            all_questions,
+                            elements_per_page=QUESTIONS_PER_PAGE,
+                            page=page,
                         )
                         current_questions = [
                             question.format() for question in current_questions
@@ -170,6 +176,8 @@ def create_app(test_config=None):
 
     @app.route("/categories/<int:category_id>/questions")
     def get_category(category_id):
+        page = request.args.get("page", 1, type=int)
+
         category = Category.query.get(category_id)
         if not category:
             abort(404)
@@ -178,7 +186,7 @@ def create_app(test_config=None):
                 Question.category == category.id
             ).all()
             current_questions_of_category = paginate(
-                questions_of_category, elements_per_page=QUESTIONS_PER_PAGE, page=1
+                questions_of_category, elements_per_page=QUESTIONS_PER_PAGE, page=page
             )
             current_questions_of_category = [
                 question.format() for question in current_questions_of_category
@@ -190,18 +198,6 @@ def create_app(test_config=None):
                     "total_questions": len(questions_of_category),
                 }
             )
-
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
-
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
 
     @app.route("/quizzes", methods=["POST"])
     def get_quiz_question():
