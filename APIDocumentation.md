@@ -8,7 +8,7 @@ Refer to [Endpoints](#Endpoints) for a complete list.
 ## API Overview
 General remarks, which are valid for all endpoints.
 ### Base URL
-This api is not currently hosted. Follow the setup instructions under README.md.
+This api is not currently hosted. Follow the setup instructions under [README](README.md).
 The base url is then defined by scheme, host, port and base route. This will be referred to as
 {{base_url}} from here on. 
 
@@ -144,7 +144,7 @@ Example response:
  - Returns:
     a json object with the following keys:
     - success: boolean status 
-    - total_questions: number of total questions in api after deletion
+    - total_questions: number of total questions in api after adding a new question
     - questions: list of questions, where each question is an object with question, answer, category and difficulty key.
     - created: id of created question
 
