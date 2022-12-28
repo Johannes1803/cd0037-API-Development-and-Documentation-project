@@ -57,10 +57,12 @@ class TriviaTestCase(unittest.TestCase):
             "success" in res.json
             and "questions" in res.json
             and "total_questions" in res.json
+            and "current_category" in res.json
         )
         self.assertTrue(res.json["success"])
         self.assertTrue(res.json["questions"])
         self.assertTrue(res.json["total_questions"])
+        self.assertTrue(res.json["current_category"])
 
     def test_get_questions_should_raise_404(self):
         """If pagination exceeds number of available pages, return 404."""

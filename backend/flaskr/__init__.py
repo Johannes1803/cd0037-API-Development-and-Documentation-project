@@ -64,15 +64,23 @@ def create_app(test_config=None):
             abort(404)
         formatted_questions = [question.format() for question in selected_questions]
 
-        return jsonify(
-            {
-                "success": True,
-                "questions": formatted_questions,
-                "total_questions": len(questions),
-                "categories": formatted_categories,
-                "current_category": None,
-            }
-        )
+        # get string rep of first question's category
+        try:
+            cat_id = formatted_questions[0]["category"]
+            cat_name = formatted_categories[cat_id]
+        except KeyError as e:
+            app.logger.debug(e)
+            abort(500)
+        else:
+            return jsonify(
+                {
+                    "success": True,
+                    "questions": formatted_questions,
+                    "total_questions": len(questions),
+                    "categories": formatted_categories,
+                    "current_category": cat_name,
+                }
+            )
 
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):

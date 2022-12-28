@@ -95,7 +95,7 @@ Example response:
         "5": "Entertainment",
         "6": "Sports"
     },
-    "current_category": null,
+    "current_category": "Entertainment",
     "questions": [
         {
             "answer": "Apollo 13",
