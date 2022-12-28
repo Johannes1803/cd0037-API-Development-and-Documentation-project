@@ -129,7 +129,7 @@ Example response:
 - Returns:
     a json object with the following keys:
     - success: boolean status 
-    - deleted: id of deletetd question
+    - deleted: id of deleted question
     - total_questions: number of total questions in api after deletion
     - questions: list of questions, where each question is an object with question, answer, category and difficulty key.
 
@@ -197,6 +197,7 @@ Example Response:
     - success: boolean status 
     - questions: list of questions, where each question is an object with question, answer, category and difficulty key. **Can be a list with zero elements**, if no matches were found for the search term.
     - total_questions: number of total_questions matching the search term.
+    - current_category: name of category of current question
 
 ### Get questions of one category
 

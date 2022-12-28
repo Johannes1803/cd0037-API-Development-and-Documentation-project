@@ -119,6 +119,9 @@ def create_app(test_config=None):
 
         if request.json.get("searchTerm"):
             with app.app_context():
+                categories = Category.query.all()
+                formatted_categories = {category.id: category.type for category in categories}
+
                 search_term = request.json["searchTerm"].lower()
                 all_matching_questions = Question.query.filter(
                     Question.question.ilike("%{}%".format(search_term))
@@ -131,12 +134,18 @@ def create_app(test_config=None):
                 current_matching_questions = [
                     question.format() for question in current_matching_questions
                 ]
-
+                try:
+                    cat_id = current_matching_questions[0]["category"]
+                    cat_name = formatted_categories[cat_id]
+                except KeyError as e:
+                    app.logger.debug(e)
+                    abort(500)
                 return jsonify(
                     {
                         "success": True,
                         "questions": current_matching_questions,
                         "total_questions": len(all_matching_questions),
+                        "current_category": cat_name
                     }
                 )
 
