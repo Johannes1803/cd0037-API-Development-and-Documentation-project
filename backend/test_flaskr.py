@@ -125,6 +125,10 @@ class TriviaTestCase(unittest.TestCase):
             and "total_questions" in res.json
         )
 
+        with self.app.app_context():
+            question = Question.query.get(res.json["created"])
+            self.assertTrue(question)
+
     def test_post_new_question_missing_arg_should_return_422(self):
         """Forgetting a required arg to init a new question should raise a 422 error."""
         # make POST request
