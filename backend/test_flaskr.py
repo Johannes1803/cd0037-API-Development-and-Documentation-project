@@ -11,7 +11,8 @@ class TriviaTestCase(unittest.TestCase):
     def setUp(self):
         """Define test variables and initialize app."""
         test_config = {
-            "SQLALCHEMY_DATABASE_URI": "postgresql://student:student@localhost:5432/trivia_test",
+            "SQLALCHEMY_DATABASE_URI":
+                "postgresql://student:student@localhost:5432/trivia_test",
             "SQLALCHEMY_TRACK_MODIFICATIONS": False,
             "TESTING": True,
         }
@@ -30,10 +31,6 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
 
     def test_get_categories_should_return_results(self):
         res = self.client().get("/categories")

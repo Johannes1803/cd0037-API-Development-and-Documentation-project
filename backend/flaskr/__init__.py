@@ -40,7 +40,9 @@ def create_app(test_config=None):
     @app.route("/categories")
     def get_categories():
         categories = Category.query.all()
-        formatted_categories = {category.id: category.type for category in categories}
+        formatted_categories = {
+            category.id: category.type for category in categories
+        }
         return jsonify(
             {
                 "success": True,
@@ -54,7 +56,9 @@ def create_app(test_config=None):
         page = request.args.get("page", 1, type=int)
 
         categories = Category.query.all()
-        formatted_categories = {category.id: category.type for category in categories}
+        formatted_categories = {
+            category.id: category.type for category in categories
+        }
 
         questions = Question.query.all()
         selected_questions = paginate(
@@ -62,7 +66,9 @@ def create_app(test_config=None):
         )
         if not selected_questions:
             abort(404)
-        formatted_questions = [question.format() for question in selected_questions]
+        formatted_questions = [
+            question.format() for question in selected_questions
+        ]
 
         # get string rep of first question's category
         try:
@@ -94,7 +100,9 @@ def create_app(test_config=None):
                     question.delete()
                     all_questions = question.query.all()
                     selected_questions = paginate(
-                        all_questions, page=page, elements_per_page=QUESTIONS_PER_PAGE
+                        all_questions,
+                        page=page,
+                        elements_per_page=QUESTIONS_PER_PAGE,
                     )
                     formatted_questions = [
                         question.format() for question in selected_questions
@@ -134,15 +142,18 @@ def create_app(test_config=None):
                     page=page,
                 )
                 current_matching_questions = [
-                    question.format() for question in current_matching_questions
+                    question.format()
+                    for question in current_matching_questions
                 ]
                 if not current_matching_questions:
-                    return jsonify({
-                        "success": True,
-                        "questions": current_matching_questions,
-                        "total_questions": len(all_matching_questions),
-                        "current_category": None
-                    })
+                    return jsonify(
+                        {
+                            "success": True,
+                            "questions": current_matching_questions,
+                            "total_questions": len(all_matching_questions),
+                            "current_category": None,
+                        }
+                    )
                 else:
                     try:
                         cat_id = current_matching_questions[0]["category"]
@@ -211,7 +222,9 @@ def create_app(test_config=None):
                 Question.category == category.id
             ).all()
             current_questions_of_category = paginate(
-                questions_of_category, elements_per_page=QUESTIONS_PER_PAGE, page=page
+                questions_of_category,
+                elements_per_page=QUESTIONS_PER_PAGE,
+                page=page,
             )
             current_questions_of_category = [
                 question.format() for question in current_questions_of_category
@@ -247,7 +260,9 @@ def create_app(test_config=None):
                 resp_dict = {
                     "success": True,
                 }
-                question = random.choice(questions).format() if questions else None
+                question = (
+                    random.choice(questions).format() if questions else None
+                )
                 if question:
                     resp_dict["question"] = question
                 return jsonify(resp_dict)
@@ -255,7 +270,13 @@ def create_app(test_config=None):
     @app.errorhandler(404)
     def not_found(error):
         return (
-            jsonify({"success": False, "error": 404, "message": "resource not found"}),
+            jsonify(
+                {
+                    "success": False,
+                    "error": 404,
+                    "message": "resource not found",
+                }
+            ),
             404,
         )
 
@@ -263,7 +284,11 @@ def create_app(test_config=None):
     def unprocessable_entity(error):
         return (
             jsonify(
-                {"success": False, "error": 422, "message": "Unprocessable Entity"}
+                {
+                    "success": False,
+                    "error": 422,
+                    "message": "Unprocessable Entity",
+                }
             ),
             422,
         )
@@ -272,7 +297,11 @@ def create_app(test_config=None):
     def internal_server_error(error):
         return (
             jsonify(
-                {"success": False, "error": 500, "message": "Internal Server Error"}
+                {
+                    "success": False,
+                    "error": 500,
+                    "message": "Internal Server Error",
+                }
             ),
             500,
         )
