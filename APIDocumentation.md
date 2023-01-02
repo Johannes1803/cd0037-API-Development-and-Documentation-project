@@ -220,7 +220,7 @@ Example Response:
 - Get an unasked question from a specific category.
 - Request Arguments: None
 - Request body: 
-    - json object with key 'previous_questions' and 'quiz_category'.
+    - json object with key 'previous_questions' and 'quiz_category' (optional).
 - Returns:
     a json object with the following keys:
     - success: boolean status 

@@ -11,8 +11,7 @@ class TriviaTestCase(unittest.TestCase):
     def setUp(self):
         """Define test variables and initialize app."""
         test_config = {
-            "SQLALCHEMY_DATABASE_URI":
-                "postgresql://student:student@localhost:5432/trivia_test",
+            "SQLALCHEMY_DATABASE_URI": "postgresql://student:student@localhost:5432/trivia_test",
             "SQLALCHEMY_TRACK_MODIFICATIONS": False,
             "TESTING": True,
         }
@@ -30,7 +29,6 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         """Executed after reach test"""
         pass
-
 
     def test_get_categories_should_return_results(self):
         res = self.client().get("/categories")
@@ -218,7 +216,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_post_quizzes_should_return_422_missing_keys_in_body(self):
         """Sending POST request to '/quizzes' should return a 422 error if required key in body is missing."""
         res = self.client().post(
-            "/quizzes", json={"previous_questions": [1, 3, 7, 20, 40]}
+            "/quizzes", json={"quiz_category": {"id": 1, "type": "Science"}}
         )
 
         # check responses
